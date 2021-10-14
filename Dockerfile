@@ -48,7 +48,7 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Kolkata /etc/localtime \
 ## Setup R
 ADD build_r.sh /tmp/
 SHELL ["/bin/bash", "-c"]
-RUN cd /tmp && bash build_r.sh -y -j AdoptJDK-OpenJ9
+RUN ./tmp/build_r.sh -y -j AdoptJDK-OpenJ9
     # && wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/R/4.1.1/build_r.sh \
     # && bash build_r.sh -y -j AdoptJDK-OpenJ9 
     # && source /root/setenv.sh
