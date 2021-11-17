@@ -50,7 +50,7 @@ jobs:
           file: ./Dockerfile
           push: true
           # platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x
-          platforms: linux/amd64, linux/ppc64le, linux/s390x
+          platforms: linux/amd64, linux/s390x
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/s390x-base-notebook:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
