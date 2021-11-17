@@ -90,11 +90,11 @@ function configureAndInstall(){
                 fi
         sudo mkdir -p /opt/adopt/java
         case $(uname -m) in
-        s390x ) archt = s390x
+        s390x ) export archt=s390x
         ;;
-        x86_64 ) archt = x86_64
+        x86_64 ) export archt=x86_64
         ;;
-        ppc64le ) archt = ppc64le
+        ppc64le ) export archt=ppc64le
         ;;
         esac
         # curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9_openj9-0.24.0/OpenJDK11U-jdk_$(uname -m)_linux_openj9_11.0.10_9_openj9-0.24.0.tar.gz
