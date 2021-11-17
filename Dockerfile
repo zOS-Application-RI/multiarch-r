@@ -20,7 +20,8 @@ ENV LC_ALL=en_US.UTF-8 \
 ADD build_r.sh /tmp/
 RUN cd /tmp \
     # && wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/R/4.1.1/build_r.sh \
-    && bash build_r.sh -y -j AdoptJDK-OpenJ9 \
+    # && bash build_r.sh -y -j AdoptJDK-OpenJ9 \
+    && bash build_r.sh -y  \
     && source /root/setenv.sh
 
 ## Setup Time Zone and required packages
