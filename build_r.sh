@@ -92,13 +92,13 @@ function configureAndInstall(){
         case $(uname -m) in
         s390x ) export archt=s390x
         ;;
-        x86_64 ) export archt=x86_64
+        x86_64 ) export archt=x64
         ;;
         ppc64le ) export archt=ppc64le
         ;;
         esac
         # curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9_openj9-0.24.0/OpenJDK11U-jdk_$(uname -m)_linux_openj9_11.0.10_9_openj9-0.24.0.tar.gz
-        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9_openj9-0.26.0/OpenJDK11U-jdk_$(archt)_linux_openj9_11.0.11_9_openj9-0.26.0.tar.gz
+        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9_openj9-0.26.0/OpenJDK11U-jdk_${archt}_linux_openj9_11.0.11_9_openj9-0.26.0.tar.gz
         # Everytime new jdk is downloaded, Ensure that --strip valueis correct
         sudo tar -zxvf adoptjdk.tar.gz -C /opt/adopt/java --strip-components 1
 
@@ -114,7 +114,7 @@ function configureAndInstall(){
                 sudo rm -rf /opt/adopt/java
                 fi
         sudo mkdir -p /opt/adopt/java
-        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_$(archt)_linux_hotspot_11.0.10_9.tar.gz 
+        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_${archt}_linux_hotspot_11.0.10_9.tar.gz 
         # curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_$(uname -m)_linux_hotspot_11.0.10_9.tar.gz 
         # Everytime new jdk is downloaded, Ensure that --strip valueis correct
         sudo tar -zxvf adoptjdk.tar.gz -C /opt/adopt/java --strip-components 1
