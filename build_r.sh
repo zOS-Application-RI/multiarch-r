@@ -89,8 +89,16 @@ function configureAndInstall(){
                 sudo rm -rf /opt/adopt/java
                 fi
         sudo mkdir -p /opt/adopt/java
-
-        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9_openj9-0.24.0/OpenJDK11U-jdk_s390x_linux_openj9_11.0.10_9_openj9-0.24.0.tar.gz
+        case $(uname -m) in
+        s390x ) archt = s390x
+        ;;
+        x86_64 ) archt = x86_64
+        ;;
+        ppc64le ) archt = ppc64le
+        ;;
+        esac
+        # curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9_openj9-0.24.0/OpenJDK11U-jdk_$(uname -m)_linux_openj9_11.0.10_9_openj9-0.24.0.tar.gz
+        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9_openj9-0.26.0/OpenJDK11U-jdk_$(archt)_linux_openj9_11.0.11_9_openj9-0.26.0.tar.gz
         # Everytime new jdk is downloaded, Ensure that --strip valueis correct
         sudo tar -zxvf adoptjdk.tar.gz -C /opt/adopt/java --strip-components 1
 
@@ -106,7 +114,8 @@ function configureAndInstall(){
                 sudo rm -rf /opt/adopt/java
                 fi
         sudo mkdir -p /opt/adopt/java
-        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_s390x_linux_hotspot_11.0.10_9.tar.gz 
+        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_$(archt)_linux_hotspot_11.0.10_9.tar.gz 
+        # curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_$(uname -m)_linux_hotspot_11.0.10_9.tar.gz 
         # Everytime new jdk is downloaded, Ensure that --strip valueis correct
         sudo tar -zxvf adoptjdk.tar.gz -C /opt/adopt/java --strip-components 1
 
@@ -122,8 +131,8 @@ function configureAndInstall(){
   case "$DISTRO" in
   "ubuntu-"* )
       sudo apt-get install -y openjdk-11-jdk openjdk-11-jdk-headless
-      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-s390x/
-          printf -- "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-s390x/\n" >> "$BUILD_ENV"
+      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-$(uname -m)/
+          printf -- "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-$(uname -m)/\n" >> "$BUILD_ENV"
     ;;
 
   "rhel-"*)
