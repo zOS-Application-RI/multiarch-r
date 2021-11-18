@@ -24,42 +24,42 @@ RUN cd /tmp \
     && bash build_r.sh -y  \
     && source /root/setenv.sh
 
-## Setup Time Zone and required packages
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential \
-    libcurl4-gnutls-dev \
-    libxml2-dev \
-    libssl-dev \
-    libfontconfig1-dev \
-    libgit2-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
-    libfreetype6-dev \
-    libpng-dev \
-    libtiff5-dev \
-    libjpeg-dev \
-    zlib1g \
-    zlib1g-dev \
-    libjpeg-dev \
-    libicu-dev \
-    libpng-dev \
-    libreadline-dev \
-    libxt-dev \
-    libsodium-dev \
-    texinfo \
-    texlive-extra-utils \
-    texlive-fonts-recommended \
-    texlive-fonts-extra \
-    texlive-latex-recommended \
-    xauth \
-    xfonts-base \
-    xvfb 
+# ## Setup Time Zone and required packages
+# RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+#     build-essential \
+#     libcurl4-gnutls-dev \
+#     libxml2-dev \
+#     libssl-dev \
+#     libfontconfig1-dev \
+#     libgit2-dev \
+#     libharfbuzz-dev \
+#     libfribidi-dev \
+#     libfreetype6-dev \
+#     libpng-dev \
+#     libtiff5-dev \
+#     libjpeg-dev \
+#     zlib1g \
+#     zlib1g-dev \
+#     libjpeg-dev \
+#     libicu-dev \
+#     libpng-dev \
+#     libreadline-dev \
+#     libxt-dev \
+#     libsodium-dev \
+#     texinfo \
+#     texlive-extra-utils \
+#     texlive-fonts-recommended \
+#     texlive-fonts-extra \
+#     texlive-latex-recommended \
+#     xauth \
+#     xfonts-base \
+#     xvfb 
 
-## Install R Plugins
-COPY packages.R /tmp/
-RUN Rscript /tmp/packages.R
-RUN rm -rf /tmp/* \
-    && apt-get autoremove -y \
-    && apt-get autoclean -y 
+# ## Install R Plugins
+# COPY packages.R /tmp/
+# RUN Rscript /tmp/packages.R
+# RUN rm -rf /tmp/* \
+#     && apt-get autoremove -y \
+#     && apt-get autoclean -y 
 
 CMD ['R']
