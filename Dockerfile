@@ -62,4 +62,4 @@ RUN cd /tmp \
 #     && apt-get autoremove -y \
 #     && apt-get autoclean -y 
 
-CMD ['R']
+CMD ["R"]
