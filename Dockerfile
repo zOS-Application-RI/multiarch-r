@@ -1,4 +1,5 @@
-FROM ubuntu
+FROM ubuntu:focal
+LABEL maintainer="Ashish Sahoo (ashissah@in.ibm.com)"
 SHELL ["/bin/bash", "-c"]
 ## Configure default locale, see https://github.com/rocker-org/rocker/issues/19
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get full-upgrade -y \
