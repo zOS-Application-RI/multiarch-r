@@ -61,12 +61,50 @@ jobs:
           push: true
           # platforms: linux/amd64, linux/arm64, linux/ppc64le, linux/s390x
           platforms: linux/amd64, linux/s390x
+          # platforms: linux/amd64, linux/s390x
+          # platforms: linux/s390x
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:latest, 
                 ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:v1,
                 ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}:${{ steps.prep.outputs.BUILD_ID }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+      -   
+        name : Docker Scan Image
+        id: scan
+        uses: anchore/scan-action@v3.1.0
+        with:
+          image: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}
+          fail-build: false
+          acs-report-enable: true
+
+
+      - name: Container image scan
+        uses: Azure/container-scan@v0.1
+        with:
+          image-name: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Run Snyk to check Docker image for vulnerabilities
+        # Snyk can be used to break the build when it detects vulnerabilities.
+        # In this case we want to upload the issues to GitHub Code Scanning
+        continue-on-error: true
+        uses: snyk/actions/docker@master
+        env:
+          # In order to use the Snyk Action you will need to have a Snyk API token.
+          # More details in https://github.com/snyk/actions#getting-your-snyk-token
+          # or you can signup for free at https://snyk.io/login
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}
+          args: --file=Dockerfile
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif, ${{ steps.scan.outputs.sarif }}
+
+
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
