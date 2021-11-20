@@ -77,6 +77,11 @@ jobs:
           image: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}
           fail-build: false
           acs-report-enable: true
+          
+      - name: Upload result to GitHub Code Scanning-1
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif, ${{ steps.scan.outputs.sarif }}
 
       - name: Container image scan
         uses: Azure/container-scan@v0.1
@@ -97,6 +102,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: snyk.sarif, ${{ steps.scan.outputs.sarif }}
+
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
