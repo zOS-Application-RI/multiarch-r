@@ -3,7 +3,7 @@
 # LICENSE: Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
 #
 # Instructions:
-# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/R/4.1.1/build_r.sh
+# Download build script: wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/R/4.1.2/build_r.sh
 # Execute build script: bash build_r.sh    (provide -h for help)
 #
 
@@ -11,7 +11,7 @@ set -e -o pipefail
 shopt -s extglob
 
 PACKAGE_NAME="R"
-PACKAGE_VERSION="4.1.1"
+PACKAGE_VERSION="4.1.2"
 CURDIR="$(pwd)"
 JAVA_PROVIDED="OpenJDK"
 FORCE="false"
@@ -23,6 +23,16 @@ R_URL="https://cran.r-project.org/src/base/R-4"
 R_URL+="/R-${PACKAGE_VERSION}.tar.gz"
 
 BUILD_ENV="$HOME/setenv.sh"
+
+# Check CPU Arch
+        case $(uname -m) in
+        s390x ) export archt=s390x
+        ;;
+        x86_64 ) export archt=amd64
+        ;;
+        ppc64le ) export archt=ppc64le
+        ;;
+        esac
 
 trap cleanup 0 1 2 ERR
 
@@ -75,54 +85,23 @@ function configureAndInstall(){
 
   printf -- "Building R %s \n,$PACKAGE_VERSION"
 
-  if [[ "$JAVA_PROVIDED" != "AdoptJDK-OpenJ9" && "$JAVA_PROVIDED" != "OpenJDK" && "$JAVA_PROVIDED" != "AdoptJDK-HotSpot" ]]
-   then
-        printf -- "$JAVA_PROVIDED is not supported, Please use valid java from {AdoptJDK-OpenJ9, AdoptJDK-HotSpot, OpenJDK} only"
-       exit 1
-  fi
-
    echo "Java provided by user $JAVA_PROVIDED" >> "$LOG_FILE"
-    if [[ "$JAVA_PROVIDED" == "AdoptJDK-OpenJ9" ]]; then
+    if [[ "$JAVA_PROVIDED" == "Semeru11" ]]; then
         # Install AdoptOpenJDK 11 (With OpenJ9)
+        printf -- "\nInstalling IBM Semeru Runtime (previously known as AdoptOpenJDK openj9) . . . \n"
         cd "$CURDIR"
-                if [ -d "/opt/adopt/java" ]; then
-                sudo rm -rf /opt/adopt/java
-                fi
-        sudo mkdir -p /opt/adopt/java
-        case $(uname -m) in
-        s390x ) export archt=s390x
-        ;;
-        x86_64 ) export archt=x64
-        ;;
-        ppc64le ) export archt=ppc64le
-        ;;
-        esac
-        # curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9_openj9-0.24.0/OpenJDK11U-jdk_$(uname -m)_linux_openj9_11.0.10_9_openj9-0.24.0.tar.gz
-        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.11%2B9_openj9-0.26.0/OpenJDK11U-jdk_${archt}_linux_openj9_11.0.11_9_openj9-0.26.0.tar.gz
-        # Everytime new jdk is downloaded, Ensure that --strip valueis correct
-        sudo tar -zxvf adoptjdk.tar.gz -C /opt/adopt/java --strip-components 1
-
-        export JAVA_HOME=/opt/adopt/java
-
-        printf -- " export JAVA_HOME=/opt/adopt/java\n" >> "$BUILD_ENV"
-        printf -- "Installed AdoptOpenJDK successfully\n" >> "$LOG_FILE"
+        wget https://github.com/AdoptOpenJDK/semeru11-binaries/releases/download/jdk-11.0.13%2B8_openj9-0.29.0/ibm-semeru-open-jdk_${archt}_linux_11.0.13_8_openj9-0.29.0.tar.gz
+	tar -xf ibm-semeru-open-jdk_${archt}_linux_11.0.13_8_openj9-0.29.0.tar.gz
+	export JAVA_HOME=$CURDIR/jdk-11.0.13+8
+        printf -- "Installation of IBM Semeru Runtime (previously known as AdoptOpenJDK openj9) is successful\n" >> "$LOG_FILE"
         
-        elif [[ "$JAVA_PROVIDED" == "AdoptJDK-HotSpot" ]]; then
-            # Install AdoptOpenJDK 11 (With HotSpot)
-                cd "$CURDIR"
-                if [ -d "/opt/adopt/java" ]; then
-                sudo rm -rf /opt/adopt/java
-                fi
-        sudo mkdir -p /opt/adopt/java
-        curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_${archt}_linux_hotspot_11.0.10_9.tar.gz 
-        # curl -SL -o adoptjdk.tar.gz https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.10%2B9/OpenJDK11U-jdk_$(uname -m)_linux_hotspot_11.0.10_9.tar.gz 
-        # Everytime new jdk is downloaded, Ensure that --strip valueis correct
-        sudo tar -zxvf adoptjdk.tar.gz -C /opt/adopt/java --strip-components 1
-
-        export JAVA_HOME=/opt/adopt/java
-
-        printf -- " export JAVA_HOME=/opt/adopt/java\n" >> "$BUILD_ENV"
-        printf -- "Installed AdoptOpenJDK successfully\n" >> "$LOG_FILE"
+      elif [[ "$JAVA_PROVIDED" == "Temurin11" ]]; then
+        printf -- "\nInstalling Eclipse Adoptium Temurin Runtime (previously known as AdoptOpenJDK hotspot) . . . \n"
+	cd $CURDIR
+	wget https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.13%2B8/OpenJDK11U-jre_${archt}_linux_hotspot_11.0.13_8.tar.gz
+        tar -xf OpenJDK11U-jre_${archt}_linux_hotspot_11.0.13_8.tar.gz
+	export JAVA_HOME=$CURDIR/jdk-11.0.13+8-jre
+	printf -- "Installation of Eclipse Adoptium Temurin Runtime (previously known as AdoptOpenJDK hotspot) is successful\n" >> "$LOG_FILE"
 
     elif [[ "$JAVA_PROVIDED" == "OpenJDK" ]]; then
         cd "$CURDIR"
@@ -131,8 +110,8 @@ function configureAndInstall(){
   case "$DISTRO" in
   "ubuntu-"* )
       sudo apt-get install -y openjdk-11-jdk openjdk-11-jdk-headless
-      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-$(uname -m)/
-          printf -- "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-$(uname -m)/\n" >> "$BUILD_ENV"
+      export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-${archt}/
+          printf -- "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-${archt}/\n" >> "$BUILD_ENV"
     ;;
 
   "rhel-"*)
@@ -151,7 +130,7 @@ function configureAndInstall(){
 
 
     else
-        err "$JAVA_PROVIDED is not supported, Please use valid java from {AdoptJDK-HotSpot, AdoptJDK-OpenJ9, OpenJDK} only"
+        err "$JAVA_PROVIDED is not supported, Please use valid java from {Semeru11, Temurin11, OpenJDK} only"
         exit 1
     fi
 
@@ -231,14 +210,14 @@ function logDetails() {
 function printHelp(){
   cat <<eof
   Usage:
-  bash build_r.sh [-y] [-d] [-t] [-j (AdoptJDK-HotSpot|AdoptJDK-OpenJ9|OpenJDK)]
+  bash build_r.sh [-y] [-d] [-t] [-j (Temurin11|Semeru11|OpenJDK)]
   where:
    -y install-without-confirmation
    -d debug
    -t test
    -j which JDK to use:
-        AdoptJDK-HotSpot - for AdoptOpenJDK 11 with HotSpot
-        AdoptJDK-OpenJ9 - for AdoptOpenJDK 11 with Eclipse OpenJ9
+        Temurin11 - Eclipse Adoptium Temurin Runtime (previously known as AdoptOpenJDK hotspot)
+        Semeru11 - IBM Semeru Runtime (previously known as AdoptOpenJDK openj9)
         OpenJDK - for OpenJDK 11
 eof
 }
@@ -285,7 +264,7 @@ logDetails
 checkPrequisites
 
 case "$DISTRO" in
-"ubuntu-18.04" | "ubuntu-20.04" | "ubuntu-21.04")
+"ubuntu-18.04" | "ubuntu-20.04" | "ubuntu-21.04" | "ubuntu-21.10")
   printf -- "Installing %s %s for %s \n" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$DISTRO" |& tee -a "$LOG_FILE"
   printf -- "Installing dependencies... it may take some time.\n"
   sudo apt-get update -y |& tee -a "$LOG_FILE"
@@ -293,9 +272,6 @@ case "$DISTRO" in
     wget curl tar gcc g++ ratfor gfortran libx11-dev make r-base \
     libcurl4-openssl-dev locales \
     |& tee -a "$LOG_FILE"
-
-  export JAVA_HOME="${JHOME}"
-  export PATH=$PATH:$JAVA_HOME/bin
 
   configureAndInstall |& tee -a "$LOG_FILE"
 ;;
@@ -312,9 +288,6 @@ case "$DISTRO" in
     perl-Text-Unidecode.noarch bzip2-devel pcre-devel help2man procps \
     |& tee -a "$LOG_FILE"
 
-  export JAVA_HOME="${JHOME}"
-  export PATH=$PATH:$JAVA_HOME/bin
-
   configureAndInstall |& tee -a "$LOG_FILE"
 ;;
 
@@ -328,10 +301,6 @@ case "$DISTRO" in
     texlive-metafont texlive-psnfss texlive-times texlive-ae texlive-fancyvrb xdg-utils \
     pango-devel tcl-devel tk-devel xorg-x11-devel perl-macros texinfo \
     |& tee -a "$LOG_FILE"
-
-
-  export JAVA_HOME="${JHOME}"
-  export PATH=$PATH:$JAVA_HOME/bin
 
   configureAndInstall |& tee -a "$LOG_FILE"
 ;;

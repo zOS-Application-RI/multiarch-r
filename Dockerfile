@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu
 LABEL maintainer="Ashish Sahoo (ashissah@in.ibm.com)"
 SHELL ["/bin/bash", "-c"]
 ## Configure default locale, see https://github.com/rocker-org/rocker/issues/19
@@ -22,7 +22,7 @@ ADD build_r.sh /tmp/
 RUN cd /tmp \
     # && wget https://raw.githubusercontent.com/linux-on-ibm-z/scripts/master/R/4.1.1/build_r.sh \
     # && bash build_r.sh -y -j AdoptJDK-OpenJ9 \
-    && bash build_r.sh -y  \
+    && bash build_r.sh -y -j Semeru11 \
     && source /root/setenv.sh
 
 # ## Setup Time Zone and required packages
