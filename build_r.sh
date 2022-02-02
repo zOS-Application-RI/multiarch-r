@@ -142,8 +142,31 @@ function configureAndInstall(){
   cd "$CURDIR"
   java -version
   curl -sSL $R_URL | tar xzf -
-  mkdir build && cd build
-  ../R-${PACKAGE_VERSION}/configure --with-x=yes --with-pcre1 --enable-utf --enable-unicode-properties --enable-jit
+        mkdir build && cd build 
+        R_PAPERSIZE=letter \
+        R_BATCHSAVE="--no-save --no-restore" \
+        R_BROWSER=xdg-open \
+        PAGER=/usr/bin/pager \
+        PERL=/usr/bin/perl \
+        R_UNZIPCMD=/usr/bin/unzip \
+        R_ZIPCMD=/usr/bin/zip \
+        R_PRINTCMD=/usr/bin/lpr \
+        LIBnn=lib \
+        AWK=/usr/bin/awk \
+        CFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g" \
+        CXXFLAGS="-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g" \
+  ../R-${PACKAGE_VERSION}/configure --enable-R-shlib \
+		   --enable-memory-profiling \
+		   --with-readline \
+		   --with-blas \
+		   --with-lapack \
+		   --with-tcltk \
+		   --with-recommended-packages \
+                   --with-x=yes \
+                   --with-pcre1 \
+                   --enable-utf \
+                   --enable-unicode-properties \
+                   --enable-jit
   make
   sudo make install
 
@@ -269,7 +292,7 @@ case "$DISTRO" in
   printf -- "Installing dependencies... it may take some time.\n"
   sudo apt-get update -y |& tee -a "$LOG_FILE"
   sudo apt-get install -y  \
-    wget curl tar gcc g++ ratfor gfortran libx11-dev make r-base \
+    wget curl tar gcc g++ ratfor gfortran libx11-dev make r-base xorg-dev \
     libcurl4-openssl-dev locales \
     |& tee -a "$LOG_FILE"
 
