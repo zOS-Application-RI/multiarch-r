@@ -28,7 +28,7 @@ BUILD_ENV="$HOME/setenv.sh"
         case $(uname -m) in
         s390x ) export archt=s390x
         ;;
-        x86_64 ) export archt=amd64
+        x86_64 ) export archt=x64
         ;;
         ppc64le ) export archt=ppc64le
         ;;
