@@ -143,7 +143,7 @@ function configureAndInstall(){
   java -version
   curl -sSL $R_URL | tar xzf -
   mkdir build && cd build
-  ../R-${PACKAGE_VERSION}/configure --with-x=no --with-pcre1
+  ../R-${PACKAGE_VERSION}/configure --with-x=yes --with-pcre1 --enable-utf --enable-unicode-properties --enable-jit
   make
   sudo make install
 

@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:21.10
 LABEL maintainer="Ashish Sahoo (ashissah@in.ibm.com)"
 SHELL ["/bin/bash", "-c"]
 ## Configure default locale, see https://github.com/rocker-org/rocker/issues/19
